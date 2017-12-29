@@ -8,81 +8,8 @@ Angular QR Code
 An AngularJS directive to create QR Codes using Kazuhiko Arase’s [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) library.
 
 [See it in action](http://monospaced.github.io/angular-qrcode).
+Forked from Monospaced's repository.
 
-Installation
-------------
-
-````bash
-npm install angular-qrcode
-````
-
-### Script elements
-
-````html
-<script src="/node_modules/qrcode-generator/qrcode.js"></script>
-<script src="/node_modules/qrcode-generator/qrcode_UTF8.js"></script>
-<script src="/node_modules/angular-qrcode/angular-qrcode.js"></script>
-````
-
-````js
-angular
-.module('your-module', [
-  'monospaced.qrcode',
-]);
-````
-
-### ES2015
-
-````js
-import qrcode from 'qrcode-generator';
-import ngQrcode from 'angular-qrcode';
-
-// hacks for the browser
-// if using webpack there is a better solution below
-window.qrcode = qrcode;
-require('/node_modules/qrcode-generator/qrcode_UTF8');
-
-angular
-.module('your-module', [
-  ngQrcode,
-]);
-````
-
-### ES2015 + webpack
-
-Add the following to `webpack.config.js`:
-
-````js
-new webpack.ProvidePlugin({
-  qrcode: 'qrcode-generator',
-})
-````
-
-Import everything, no need for `window` or `require` hacks:
-
-````js
-import qrcode from 'qrcode-generator';
-import qrcode_UTF8 from '/node_modules/qrcode-generator/qrcode_UTF8';
-import ngQrcode from 'angular-qrcode';
-
-angular
-.module('your-module', [
-  ngQrcode,
-]);
-````
-
-Important!
-----------
-
-### Version and Error Correction
-
-The amount of data a qrcode can contain is impacted by its `version` and `error-correction-level`.
-
-`version` designates the density of the encoding. If it isn't specifed, it defaults to `5`. __If the `version` specified is too small to contain the data given, the next highest `version` will be tried automatically.__
-
-The maximum supported `version` is `40`, and `error-correction-level`defaults to `M`.
-
-For more information see http://www.qrcode.com/en/about/version.html.
 
 Usage
 -----
@@ -116,7 +43,7 @@ as a link to URL
 with expressions, observe changes
 
 ````html
-<qrcode version="{{version}}" error-correction-level="{{level}}" size="{{size}}" data="{{var}}" href="{{var}}" color="{{color}}" background="{{background}}" download></qrcode>
+<qrcode version="{{version}}" error-correction-level="{{level}}" size="{{size}}" data="{{var}}" href="{{var}}" color="{{color}}" background="{{background}}" padding="{{padding}}" name="{{name}}" download></qrcode>
 ````
 
 Options
@@ -137,6 +64,10 @@ Permitted values
 * `color`: `hex` as `string` (default: `#000`)
 
 * `background`: `hex` as `string` (default: `#fff`)
+
+* `padding`: `integer` (default: `0`)
+
+* `name`: `string` (default: `qrcode`) _- name of image that might be downloaded in png format._
 
 The amount of data (measured in bits) must be within capacity according to the `version` and `error correction level`, see http://www.qrcode.com/en/about/version.html.
 
