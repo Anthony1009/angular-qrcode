@@ -2,6 +2,7 @@
  * angular-qrcode
  * (c) 2017 Monospaced http://monospaced.com
  * License: MIT
+ * forked from Monospaced, and add some options
  */
 
 if (typeof module !== 'undefined' &&
@@ -20,15 +21,21 @@ angular.module('monospaced.qrcode', [])
           'Q': 'Quartile',
           'H': 'High'
         },
-        draw = function(context, qr, modules, tile, color) {
-          for (var row = 0; row < modules; row++) {
-            for (var col = 0; col < modules; col++) {
+        draw = function(context, qr, modules, tile, padd, color) {
+          for (var row = 0; row < (modules + padd * 2); row++) {
+            for (var col = 0; col < (modules + padd * 2); col++) {
               var w = (Math.ceil((col + 1) * tile) - Math.floor(col * tile)),
                   h = (Math.ceil((row + 1) * tile) - Math.floor(row * tile));
-
-              context.fillStyle = qr.isDark(row, col) ? color.foreground : color.background;
-              context.fillRect(Math.round(col * tile),
+                  if ((padd <= row && row < (modules + padd)) && ((padd <= col) && col < (modules + padd))) {
+                    context.fillStyle = qr.isDark((row-padd), (col - padd)) ? color.foreground : color.background;
+                    context.fillRect(Math.round(col * tile),
                                Math.round(row * tile), w, h);
+                  } else {
+                    context.fillStyle = color.background;
+                    context.fillRect(Math.round(col * tile),
+                               Math.round(row * tile), w, h);
+                  }
+              
             }
           }
         };
@@ -52,7 +59,10 @@ angular.module('monospaced.qrcode', [])
             size,
             modules,
             tile,
+            padd,
             qr,
+            padding = attrs.padding || 0,
+            name = attrs.name || 'qrcode',
             $img,
             color = {
               foreground: '#000',
@@ -99,7 +109,8 @@ angular.module('monospaced.qrcode', [])
             setSize = function(value) {
               size = parseInt(value, 10) || modules * 2;
               tile = size / modules;
-              canvas.width = canvas.height = size;
+              padd = Math.floor(padding / tile);
+              canvas.width = canvas.height = size + padding * 2;
             },
             render = function() {
               if (!qr) {
@@ -122,12 +133,12 @@ angular.module('monospaced.qrcode', [])
               }
 
               if (download) {
-                domElement.download = 'qrcode.png';
+                domElement.download =  name + '.png';
                 domElement.title = 'Download QR code';
               }
 
               if (canvas2D) {
-                draw(context, qr, modules, tile, color);
+                draw(context, qr, modules, tile, padd, color);
 
                 if (download) {
                   domElement.href = canvas.toDataURL('image/png');
@@ -226,6 +237,24 @@ angular.module('monospaced.qrcode', [])
           }
 
           href = value;
+          render();
+        });
+
+        attrs.$observe('padding', function(value) {
+          if (!value) {
+            return;
+          }
+
+          padding = value;
+          render();
+        });
+
+        attrs.$observe('name', function(value) {
+          if (!value) {
+            return;
+          }
+
+          name = value;
           render();
         });
       }
